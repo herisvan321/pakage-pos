@@ -20,7 +20,7 @@ Aplikasi Point of Sales dengan Laravel Package yang terintegrasi dengan Spatie P
 composer require herisvanhendra/pos
 ```
 
-2. Publish config dan assets:
+2. Publish config, migrations, dan assets:
 
 ```bash
 php artisan vendor:publish --provider="Herisvanhendra\Pos\PosServiceProvider"
@@ -38,7 +38,7 @@ php artisan migrate
 php artisan db:seed --class="Herisvanhendra\Pos\Database\Seeders\PosSeeder"
 ```
 
-5. Setup User model:
+5. Setup User model (jika menggunakan User model sendiri):
 
 Tambahkan trait pada `app/Models/User.php`:
 
@@ -52,13 +52,15 @@ class User extends Authenticatable
 }
 ```
 
-6. Configure auth guard di `config/auth.php`:
+## Quick Install (Otomatis)
+
+Package ini menyediakan User model bawaan. Untuk menggunakan, pastikan di `config/auth.php`:
 
 ```php
-'guards' => [
-    'web' => [
-        'driver' => 'session',
-        'provider' => 'users',
+'providers' => [
+    'users' => [
+        'driver' => 'eloquent',
+        'model' => Herisvanhendra\Pos\Models\User::class,
     ],
 ],
 ```
@@ -83,7 +85,7 @@ Setelah seeding, berikut akun yang tersedia:
 
 ## Customization
 
-### Publish Views
+### Publish Views Only
 
 ```bash
 php artisan vendor:publish --tag="pos-views"
@@ -91,11 +93,30 @@ php artisan vendor:publish --tag="pos-views"
 
 Views akan dipublish ke `resources/views/vendor/pos`
 
-### Publish Migrations
+### Publish Migrations Only
 
 ```bash
 php artisan vendor:publish --tag="pos-migrations"
 ```
+
+### Publish Config Only
+
+```bash
+php artisan vendor:publish --tag="pos-config"
+```
+
+### Publish All
+
+```bash
+php artisan vendor:publish --tag="pos-all"
+```
+
+## Troubleshooting
+
+Jika terjadi error "no such table: permissions", pastikan:
+
+1. Publish config: `php artisan vendor:publish --provider="Herisvanhendra\Pos\PosServiceProvider"`
+2. Jalankan migrate: `php artisan migrate`
 
 ## Lisensi
 
