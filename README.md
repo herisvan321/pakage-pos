@@ -20,49 +20,16 @@ Aplikasi Point of Sales dengan Laravel Package yang terintegrasi dengan Spatie P
 composer require herisvanhendra/pos
 ```
 
-2. Publish config, migrations, dan assets:
-
-```bash
-php artisan vendor:publish --provider="Herisvanhendra\Pos\PosServiceProvider"
-```
-
-3. Jalankan migration:
+2. Jalankan migration (otomatis membuat semua tabel termasuk Spatie permissions):
 
 ```bash
 php artisan migrate
 ```
 
-4. Seed database dengan data sample:
+3. Seed database dengan data sample:
 
 ```bash
 php artisan db:seed --class="Herisvanhendra\Pos\Database\Seeders\PosSeeder"
-```
-
-5. Setup User model (jika menggunakan User model sendiri):
-
-Tambahkan trait pada `app/Models/User.php`:
-
-```php
-use Spatie\Permission\Traits\HasRoles;
-
-class User extends Authenticatable
-{
-    use HasRoles;
-    // ...
-}
-```
-
-## Quick Install (Otomatis)
-
-Package ini menyediakan User model bawaan. Untuk menggunakan, pastikan di `config/auth.php`:
-
-```php
-'providers' => [
-    'users' => [
-        'driver' => 'eloquent',
-        'model' => Herisvanhendra\Pos\Models\User::class,
-    ],
-],
 ```
 
 ## Akun Demo
@@ -85,7 +52,7 @@ Setelah seeding, berikut akun yang tersedia:
 
 ## Customization
 
-### Publish Views Only
+### Publish Views
 
 ```bash
 php artisan vendor:publish --tag="pos-views"
@@ -93,30 +60,19 @@ php artisan vendor:publish --tag="pos-views"
 
 Views akan dipublish ke `resources/views/vendor/pos`
 
-### Publish Migrations Only
+### Publish Migrations
 
 ```bash
 php artisan vendor:publish --tag="pos-migrations"
 ```
 
-### Publish Config Only
-
-```bash
-php artisan vendor:publish --tag="pos-config"
-```
-
-### Publish All
-
-```bash
-php artisan vendor:publish --tag="pos-all"
-```
-
 ## Troubleshooting
 
-Jika terjadi error "no such table: permissions", pastikan:
+Jika terjadi error, coba:
 
-1. Publish config: `php artisan vendor:publish --provider="Herisvanhendra\Pos\PosServiceProvider"`
-2. Jalankan migrate: `php artisan migrate`
+```bash
+php artisan migrate:fresh --seed --seeder="Herisvanhendra\Pos\Database\Seeders\PosSeeder"
+```
 
 ## Lisensi
 

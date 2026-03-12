@@ -8,74 +8,10 @@ return new class extends Migration
 {
     public function up()
     {
-        // Get table names from config or use defaults
-        $tableNames = config('permission.table_names', [
-            'permissions' => 'permissions',
-            'roles' => 'roles',
-            'model_has_permissions' => 'model_has_permissions',
-            'model_has_roles' => 'model_has_roles',
-            'role_has_permissions' => 'role_has_permissions',
-        ]);
+        // Create Spatie permission tables if they don't exist
+        $this->createSpatieTablesIfNotExists();
 
-        $columnNames = config('permission.column_names', [
-            'model_morph_key' => 'model_id',
-        ]);
-
-        // Spatie Permission Tables
-        Schema::create($tableNames['permissions'], function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('guard_name');
-            $table->timestamps();
-            $table->unique(['name', 'guard_name']);
-        });
-
-        Schema::create($tableNames['roles'], function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('guard_name');
-            $table->timestamps();
-            $table->unique(['name', 'guard_name']);
-        });
-
-        Schema::create($tableNames['model_has_permissions'], function (Blueprint $table) use ($tableNames, $columnNames) {
-            $table->unsignedBigInteger('permission_id');
-            $table->morphs('model');
-            $table->foreign('permission_id')
-                ->references('id')
-                ->on($tableNames['permissions'])
-                ->onDelete('cascade');
-
-            $table->primary(['permission_id', $columnNames['model_morph_key'], 'model_type'], 'model_has_permissions_permission_model_type_primary');
-        });
-
-        Schema::create($tableNames['model_has_roles'], function (Blueprint $table) use ($tableNames, $columnNames) {
-            $table->unsignedBigInteger('role_id');
-            $table->morphs('model');
-            $table->foreign('role_id')
-                ->references('id')
-                ->on($tableNames['roles'])
-                ->onDelete('cascade');
-
-            $table->primary(['role_id', $columnNames['model_morph_key'], 'model_type'], 'model_has_roles_role_model_type_primary');
-        });
-
-        Schema::create($tableNames['role_has_permissions'], function (Blueprint $table) use ($tableNames) {
-            $table->unsignedBigInteger('permission_id');
-            $table->unsignedBigInteger('role_id');
-            $table->foreign('permission_id')
-                ->references('id')
-                ->on($tableNames['permissions'])
-                ->onDelete('cascade');
-            $table->foreign('role_id')
-                ->references('id')
-                ->on($tableNames['roles'])
-                ->onDelete('cascade');
-
-            $table->primary(['permission_id', 'role_id'], 'role_has_permissions_permission_id_role_id_primary');
-        });
-
-        // POS Tables
+        // POS Tables - Categories
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -83,6 +19,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // POS Tables - Products
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->string('name');
@@ -93,6 +30,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // POS Tables - Sales
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
@@ -101,6 +39,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
+        // POS Tables - Sale Items
         Schema::create('sale_items', function (Blueprint $table) {
             $table->id();
             $table->foreignId('sale_id')->constrained()->onDelete('cascade');
@@ -112,26 +51,85 @@ return new class extends Migration
         });
     }
 
+    protected function createSpatieTablesIfNotExists()
+    {
+        // Get table names
+        $permissionsTable = 'permissions';
+        $rolesTable = 'roles';
+        $modelHasPermissionsTable = 'model_has_permissions';
+        $modelHasRolesTable = 'model_has_roles';
+        $roleHasPermissionsTable = 'role_has_permissions';
+
+        // Create permissions table if not exists
+        if (!Schema::hasTable($permissionsTable)) {
+            Schema::create($permissionsTable, function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->string('guard_name');
+                $table->timestamps();
+                $table->unique(['name', 'guard_name']);
+            });
+        }
+
+        // Create roles table if not exists
+        if (!Schema::hasTable($rolesTable)) {
+            Schema::create($rolesTable, function (Blueprint $table) {
+                $table->bigIncrements('id');
+                $table->string('name');
+                $table->string('guard_name');
+                $table->timestamps();
+                $table->unique(['name', 'guard_name']);
+            });
+        }
+
+        // Create model_has_permissions table if not exists
+        if (!Schema::hasTable($modelHasPermissionsTable)) {
+            Schema::create($modelHasPermissionsTable, function (Blueprint $table) use ($permissionsTable) {
+                $table->unsignedBigInteger('permission_id');
+                $table->morphs('model');
+                $table->foreign('permission_id')
+                    ->references('id')
+                    ->on($permissionsTable)
+                    ->onDelete('cascade');
+            });
+        }
+
+        // Create model_has_roles table if not exists
+        if (!Schema::hasTable($modelHasRolesTable)) {
+            Schema::create($modelHasRolesTable, function (Blueprint $table) use ($rolesTable) {
+                $table->unsignedBigInteger('role_id');
+                $table->morphs('model');
+                $table->foreign('role_id')
+                    ->references('id')
+                    ->on($rolesTable)
+                    ->onDelete('cascade');
+            });
+        }
+
+        // Create role_has_permissions table if not exists
+        if (!Schema::hasTable($roleHasPermissionsTable)) {
+            Schema::create($roleHasPermissionsTable, function (Blueprint $table) use ($permissionsTable, $rolesTable) {
+                $table->unsignedBigInteger('permission_id');
+                $table->unsignedBigInteger('role_id');
+                $table->foreign('permission_id')
+                    ->references('id')
+                    ->on($permissionsTable)
+                    ->onDelete('cascade');
+                $table->foreign('role_id')
+                    ->references('id')
+                    ->on($rolesTable)
+                    ->onDelete('cascade');
+                $table->primary(['permission_id', 'role_id']);
+            });
+        }
+    }
+
     public function down()
     {
-        $tableNames = config('permission.table_names', [
-            'permissions' => 'permissions',
-            'roles' => 'roles',
-            'model_has_permissions' => 'model_has_permissions',
-            'model_has_roles' => 'model_has_roles',
-            'role_has_permissions' => 'role_has_permissions',
-        ]);
-
         Schema::dropIfExists('sale_items');
         Schema::dropIfExists('sales');
         Schema::dropIfExists('products');
         Schema::dropIfExists('categories');
-
-        Schema::dropIfExists($tableNames['role_has_permissions']);
-        Schema::dropIfExists($tableNames['model_has_roles']);
-        Schema::dropIfExists($tableNames['model_has_permissions']);
-        Schema::dropIfExists($tableNames['roles']);
-        Schema::dropIfExists($tableNames['permissions']);
     }
 };
 
