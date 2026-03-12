@@ -21,9 +21,9 @@
     <div class="bg-white rounded-xl shadow-sm p-6 border-l-4 border-green-500">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-gray-500 text-sm">Total Kategori</p>
-                <p class="text-3xl font-bold text-gray-800">{{ $totalCategories }}</p>
-            </div>
+<p class="text-gray-500 text-sm">Total Kategori</p>
+        <p class="text-3xl font-bold text-gray-800">{{ isset($totalCategories) ? $totalCategories : 0 }}</p>
+    </div>
             <div class="bg-green-100 p-4 rounded-full">
                 <i class="fas fa-tags text-green-600 text-2xl"></i>
             </div>
@@ -34,7 +34,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-500 text-sm">Penjualan Hari Ini</p>
-                <p class="text-3xl font-bold text-gray-800">Rp {{ number_format($todaySales, 0, ',', '.') }}</p>
+<p class="text-3xl font-bold text-gray-800">Rp {{ number_format(isset($today_revenue) ? $today_revenue : 0, 0, ',', '.') }}</p>
             </div>
             <div class="bg-purple-100 p-4 rounded-full">
                 <i class="fas fa-chart-line text-purple-600 text-2xl"></i>
@@ -46,7 +46,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-gray-500 text-sm">Total Penjualan</p>
-                <p class="text-3xl font-bold text-gray-800">Rp {{ number_format($totalSales, 0, ',', '.') }}</p>
+<p class="text-3xl font-bold text-gray-800">Rp {{ number_format(isset($month_revenue) ? $month_revenue : 0, 0, ',', '.') }}</p>
             </div>
             <div class="bg-orange-100 p-4 rounded-full">
                 <i class="fas fa-money-bill-wave text-orange-600 text-2xl"></i>
@@ -72,7 +72,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($recentSales as $sale)
+@forelse(isset($recentSales) && is_array($recentSales) ? $recentSales : [] as $sale)
                     <tr class="border-b hover:bg-gray-50">
                         <td class="py-3 px-2">#{{ $sale->id }}</td>
                         <td class="py-3 px-2">{{ $sale->created_at->format('d/m/Y H:i') }}</td>
@@ -99,7 +99,7 @@
             <i class="fas fa-exclamation-triangle mr-2"></i>Stok Menipis
         </h3>
         <div class="space-y-3">
-            @forelse($lowStockProducts as $product)
+@forelse(isset($lowStockProducts) && is_array($lowStockProducts) ? $lowStockProducts : [] as $product)
             <div class="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                 <div class="flex items-center space-x-3">
                     <i class="fas fa-box text-red-500"></i>
