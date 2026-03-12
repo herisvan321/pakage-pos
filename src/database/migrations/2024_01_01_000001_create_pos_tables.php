@@ -8,14 +8,20 @@ return new class extends Migration
 {
     public function up()
     {
+        // Get table names from config or use defaults
+        $tableNames = config('permission.table_names', [
+            'permissions' => 'permissions',
+            'roles' => 'roles',
+            'model_has_permissions' => 'model_has_permissions',
+            'model_has_roles' => 'model_has_roles',
+            'role_has_permissions' => 'role_has_permissions',
+        ]);
+
+        $columnNames = config('permission.column_names', [
+            'model_morph_key' => 'model_id',
+        ]);
+
         // Spatie Permission Tables
-        $tableNames = config('permission.table_names');
-        $columnNames = config('permission.column_names');
-
-        if (empty($tableNames)) {
-            throw new \Exception('Error: config/permission.php not loaded. Run [php artisan vendor:publish --provider="Spatie\Permission\PermissionServiceProvider"] to publish it.');
-        }
-
         Schema::create($tableNames['permissions'], function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');
@@ -108,15 +114,18 @@ return new class extends Migration
 
     public function down()
     {
+        $tableNames = config('permission.table_names', [
+            'permissions' => 'permissions',
+            'roles' => 'roles',
+            'model_has_permissions' => 'model_has_permissions',
+            'model_has_roles' => 'model_has_roles',
+            'role_has_permissions' => 'role_has_permissions',
+        ]);
+
         Schema::dropIfExists('sale_items');
         Schema::dropIfExists('sales');
         Schema::dropIfExists('products');
         Schema::dropIfExists('categories');
-
-        $tableNames = config('permission.table_names');
-        if (empty($tableNames)) {
-            return;
-        }
 
         Schema::dropIfExists($tableNames['role_has_permissions']);
         Schema::dropIfExists($tableNames['model_has_roles']);
