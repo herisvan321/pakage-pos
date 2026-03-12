@@ -19,14 +19,9 @@ class PosSeeder extends Seeder
         Role::where('guard_name', '')->delete();
 
         // Get guard from Spatie config
-        $guardName = config('permission.guard_name', 'web');
-        
-        // If still empty, use 'web'
-        if (empty($guardName)) {
-            $guardName = 'web';
-        }
+// Use default guard from Spatie config (empty string)
+        $defaultGuard = config('permission.defaults.guard_name', '');
 
-        // Create permissions without specifying guard (let Spatie use config default)
         $permissions = [
             'manage categories',
             'manage products',
@@ -36,15 +31,24 @@ class PosSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => $defaultGuard
+            ]);
         }
 
         // Create admin role
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $adminRole = Role::firstOrCreate([
+            'name' => 'admin',
+            'guard_name' => $defaultGuard
+        ]);
         $adminRole->syncPermissions($permissions);
 
         // Create kasir role
-        $kasirRole = Role::firstOrCreate(['name' => 'kasir']);
+        $kasirRole = Role::firstOrCreate([
+            'name' => 'kasir',
+            'guard_name' => $defaultGuard
+        ]);
         $kasirRole->syncPermissions(['manage sales', 'view reports']);
 
         // Create admin user
