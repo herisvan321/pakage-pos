@@ -14,14 +14,19 @@ class PosSeeder extends Seeder
 {
     public function run()
     {
-        // Use 'web' as guard name
-        $guardName = 'web';
-
         // Clean up existing permissions/roles with empty guard
         Permission::where('guard_name', '')->delete();
         Role::where('guard_name', '')->delete();
 
-        // Create permissions
+        // Get guard from Spatie config
+        $guardName = config('permission.guard_name', 'web');
+        
+        // If still empty, use 'web'
+        if (empty($guardName)) {
+            $guardName = 'web';
+        }
+
+        // Create permissions without specifying guard (let Spatie use config default)
         $permissions = [
             'manage categories',
             'manage products',
@@ -31,25 +36,16 @@ class PosSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(
-                ['name' => $permission, 'guard_name' => $guardName],
-                ['name' => $permission, 'guard_name' => $guardName]
-            );
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Create admin role
-        $adminRole = Role::firstOrCreate(
-            ['name' => 'admin', 'guard_name' => $guardName],
-            ['name' => 'admin', 'guard_name' => $guardName]
-        );
-        $adminRole->givePermissionTo($permissions);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $adminRole->syncPermissions($permissions);
 
         // Create kasir role
-        $kasirRole = Role::firstOrCreate(
-            ['name' => 'kasir', 'guard_name' => $guardName],
-            ['name' => 'kasir', 'guard_name' => $guardName]
-        );
-        $kasirRole->givePermissionTo(['manage sales', 'view reports']);
+        $kasirRole = Role::firstOrCreate(['name' => 'kasir']);
+        $kasirRole->syncPermissions(['manage sales', 'view reports']);
 
         // Create admin user
         $admin = User::firstOrCreate(
@@ -59,7 +55,7 @@ class PosSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
-        $admin->assignRole('admin');
+        $admin->syncRoles(['admin']);
 
         // Create kasir user
         $kasir = User::firstOrCreate(
@@ -69,7 +65,7 @@ class PosSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
-        $kasir->assignRole('kasir');
+        $kasir->syncRoles(['kasir']);
 
         // Create sample categories
         $categories = [
