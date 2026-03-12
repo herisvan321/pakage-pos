@@ -23,6 +23,11 @@ class PosServiceProvider extends ServiceProvider
             __DIR__ . '/database/migrations' => database_path('migrations'),
         ], 'pos-migrations');
 
+        // Publish seeders
+        $this->publishes([
+            __DIR__ . '/database/seeders' => database_path('seeders'),
+        ], 'pos-seeders');
+
         // Publish views
         $this->publishes([
             __DIR__ . '/resources/views' => resource_path('views/vendor/pos'),

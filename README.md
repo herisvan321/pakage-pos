@@ -39,11 +39,16 @@ class User extends Authenticatable
 php artisan migrate
 ```
 
-4. Seed database dengan data sample:
+4. **Publish seeders (optional, untuk membuat seeder tersedia di database/seeders public):**
+```bash
+php artisan vendor:publish --tag="pos-seeders"
+```
 
+5. Seed database dengan data sample:
 ```bash
 php artisan db:seed --class="Herisvanhendra\Pos\Database\Seeders\PosSeeder"
 ```
+
 
 
 ## Akun Demo
