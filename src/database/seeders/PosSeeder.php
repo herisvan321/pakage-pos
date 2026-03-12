@@ -14,8 +14,12 @@ class PosSeeder extends Seeder
 {
     public function run()
     {
-        // Get the default guard from config
-        $guardName = config('auth.defaults.guard', 'web');
+        // Use 'web' as guard name
+        $guardName = 'web';
+
+        // Clean up existing permissions/roles with empty guard
+        Permission::where('guard_name', '')->delete();
+        Role::where('guard_name', '')->delete();
 
         // Create permissions
         $permissions = [
@@ -27,15 +31,24 @@ class PosSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission, 'guard_name' => $guardName]);
+            Permission::firstOrCreate(
+                ['name' => $permission, 'guard_name' => $guardName],
+                ['name' => $permission, 'guard_name' => $guardName]
+            );
         }
 
         // Create admin role
-        $adminRole = Role::firstOrCreate(['name' => 'admin', 'guard_name' => $guardName]);
+        $adminRole = Role::firstOrCreate(
+            ['name' => 'admin', 'guard_name' => $guardName],
+            ['name' => 'admin', 'guard_name' => $guardName]
+        );
         $adminRole->givePermissionTo($permissions);
 
         // Create kasir role
-        $kasirRole = Role::firstOrCreate(['name' => 'kasir', 'guard_name' => $guardName]);
+        $kasirRole = Role::firstOrCreate(
+            ['name' => 'kasir', 'guard_name' => $guardName],
+            ['name' => 'kasir', 'guard_name' => $guardName]
+        );
         $kasirRole->givePermissionTo(['manage sales', 'view reports']);
 
         // Create admin user
