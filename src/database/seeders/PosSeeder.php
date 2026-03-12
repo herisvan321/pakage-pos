@@ -55,7 +55,7 @@ class PosSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
-        $admin->syncRoles(['admin']);
+        $admin->assignRole('admin');
 
         // Create kasir user
         $kasir = User::firstOrCreate(
@@ -65,7 +65,7 @@ class PosSeeder extends Seeder
                 'password' => Hash::make('password'),
             ]
         );
-        $kasir->syncRoles(['kasir']);
+        $kasir->assignRole('kasir');
 
         // Create sample categories
         $categories = [

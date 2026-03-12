@@ -20,17 +20,31 @@ Aplikasi Point of Sales dengan Laravel Package yang terintegrasi dengan Spatie P
 composer require herisvanhendra/pos
 ```
 
-2. Jalankan migration (otomatis membuat semua tabel termasuk Spatie permissions):
+2. **Tambahkan HasRoles trait di User Model** (`app/Models/User.php`):
+
+```php
+use Spatie\Permission\Traits\HasRoles;
+
+class User extends Authenticatable
+{
+    use HasRoles;
+
+    // ... rest of your code
+}
+```
+
+3. Jalankan migration (otomatis membuat semua tabel termasuk Spatie permissions):
 
 ```bash
 php artisan migrate
 ```
 
-3. Seed database dengan data sample:
+4. Seed database dengan data sample:
 
 ```bash
 php artisan db:seed --class="Herisvanhendra\Pos\Database\Seeders\PosSeeder"
 ```
+
 
 ## Akun Demo
 
