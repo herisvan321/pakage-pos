@@ -39,15 +39,17 @@ class User extends Authenticatable
 php artisan migrate
 ```
 
-4. **Publish seeders (optional, untuk membuat seeder tersedia di database/seeders public):**
+4. **Publish seeders (optional):**
 ```bash
 php artisan vendor:publish --tag="pos-seeders"
 ```
 
-5. Seed database dengan data sample:
+5. **Seeder hanya membuat roles & sample data** (no users):
 ```bash
 php artisan db:seed --class="Herisvanhendra\Pos\Database\Seeders\PosSeeder"
 ```
+
+6. **Register akun baru** di `/pos/register` → Auto dapat role **admin**
 
 
 

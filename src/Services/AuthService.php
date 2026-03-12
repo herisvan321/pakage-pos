@@ -52,5 +52,29 @@ class AuthService
             'password' => 'required',
         ]);
     }
+
+    /**
+     * Validate register request
+     */
+    public function validateRegisterRequest(Request $request): array
+    {
+        return $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+    }
+
+    /**
+     * Register new user
+     */
+    public function register(array $credentials): User
+    {
+        return User::create([
+            'name' => $credentials['name'],
+            'email' => $credentials['email'],
+            'password' => Hash::make($credentials['password']),
+        ]);
+    }
 }
 

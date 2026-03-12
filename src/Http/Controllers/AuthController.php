@@ -19,6 +19,25 @@ class AuthController extends Controller
         return view('pos::auth.login');
     }
 
+    public function showRegisterForm()
+    {
+        return view('pos::auth.register');
+    }
+
+    public function register(Request $request)
+    {
+        $credentials = $this->authService->validateRegisterRequest($request);
+        
+        $user = $this->authService->register($credentials);
+        
+        $this->authService->authenticate($user);
+        
+        // Auto assign admin role to new users
+        $user->assignRole('admin');
+
+        return redirect()->route('pos.dashboard')->with('success', 'Akun berhasil dibuat dan login otomatis!');
+    }
+
     public function login(Request $request)
     {
         $credentials = $this->authService->validateLoginRequest($request);

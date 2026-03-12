@@ -19,9 +19,15 @@ class PosSeeder extends Seeder
         Role::where('guard_name', '')->delete();
 
         // Get guard from Spatie config
-// Use default guard from Spatie config (empty string)
-        $defaultGuard = config('permission.defaults.guard_name', '');
+// Get guard from Spatie config
+        $guardName = config('permission.guard_name', 'web');
+        
+        // If still empty, use 'web'
+        if (empty($guardName)) {
+            $guardName = 'web';
+        }
 
+        // Create permissions without specifying guard (let Spatie use config default)
         $permissions = [
             'manage categories',
             'manage products',
@@ -31,45 +37,19 @@ class PosSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate([
-                'name' => $permission,
-                'guard_name' => $defaultGuard
-            ]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // Create admin role
-        $adminRole = Role::firstOrCreate([
-            'name' => 'admin',
-            'guard_name' => $defaultGuard
-        ]);
+        $adminRole = Role::firstOrCreate(['name' => 'admin']);
         $adminRole->syncPermissions($permissions);
 
         // Create kasir role
-        $kasirRole = Role::firstOrCreate([
-            'name' => 'kasir',
-            'guard_name' => $defaultGuard
-        ]);
+        $kasirRole = Role::firstOrCreate(['name' => 'kasir']);
         $kasirRole->syncPermissions(['manage sales', 'view reports']);
 
-        // Create admin user
-        $admin = User::firstOrCreate(
-            ['email' => 'admin@pos.com'],
-            [
-                'name' => 'Administrator',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $admin->assignRole('admin');
+// No user creation - users can register and auto get admin role
 
-        // Create kasir user
-        $kasir = User::firstOrCreate(
-            ['email' => 'kasir@pos.com'],
-            [
-                'name' => 'Kasir',
-                'password' => Hash::make('password'),
-            ]
-        );
-        $kasir->assignRole('kasir');
 
         // Create sample categories
         $categories = [

@@ -8,10 +8,12 @@ use Herisvanhendra\Pos\Http\Controllers\ProductController;
 use Herisvanhendra\Pos\Http\Controllers\SaleController;
 use Herisvanhendra\Pos\Http\Controllers\ReportController;
 
-// Guest Routes (Login)
+// Guest Routes (Login & Register)
 Route::middleware(['web', 'guest'])->group(function () {
     Route::get('/pos/login', [AuthController::class, 'showLoginForm'])->name('pos.login');
     Route::post('/pos/login', [AuthController::class, 'login'])->name('pos.login.post');
+    Route::get('/pos/register', [AuthController::class, 'showRegisterForm'])->name('pos.register.form');
+    Route::post('/pos/register', [AuthController::class, 'register'])->name('pos.register');
 });
 
 // Protected Routes
