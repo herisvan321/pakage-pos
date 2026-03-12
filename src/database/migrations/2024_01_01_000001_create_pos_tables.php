@@ -65,7 +65,7 @@ return new class extends Migration
             Schema::create($permissionsTable, function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('name');
-                $table->string('guard_name');
+                $table->string('guard_name')->default('web');
                 $table->timestamps();
                 $table->unique(['name', 'guard_name']);
             });
@@ -76,7 +76,7 @@ return new class extends Migration
             Schema::create($rolesTable, function (Blueprint $table) {
                 $table->bigIncrements('id');
                 $table->string('name');
-                $table->string('guard_name');
+                $table->string('guard_name')->default('web');
                 $table->timestamps();
                 $table->unique(['name', 'guard_name']);
             });
